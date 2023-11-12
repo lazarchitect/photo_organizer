@@ -70,7 +70,6 @@ if __name__ == "__main__":
             dest_photo_path = dest_folder_path + delimiter + file_name
             
             try:
-                print(dest_folder_path)
                 rename(src_photo_path, dest_photo_path)
             except FileExistsError:
                 print(dest_folder_path)
