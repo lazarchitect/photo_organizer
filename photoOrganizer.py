@@ -74,12 +74,3 @@ if __name__ == "__main__":
                 rename(src_photo_path, dest_photo_path)
             except FileExistsError:
                 print(dest_folder_path)
-
-
-"""
-some folders to check
-2021-07-18
-2021-11-21
-2022-04-05
-2022-05-14
-"""
