@@ -8,7 +8,7 @@ from datetime import datetime
 
 photos_dir = "D:\\Photos"
 delimiter = "\\"
-specific_folder_name = "2019-03-05"
+specific_folder_name = "RenFaire"
 photo_dump_folder = photos_dir + delimiter + specific_folder_name
 
 """turns .*yyyy:mm:dd.* into yyyy-mm-dd"""
@@ -47,6 +47,10 @@ def getModifiedDate(path_to_photo):
 
 if __name__ == "__main__":
 
+    if not isdir(photo_dump_folder):
+        print("\nbad directory; " + photo_dump_folder + " does not exist\n")
+        exit()
+
     fso_iterator = scandir(photo_dump_folder)
 
     for fso in fso_iterator:
@@ -61,7 +65,9 @@ if __name__ == "__main__":
             except KeyError: # PNGs, screenshots don't have exif data
                 photo_date = getModifiedDate(src_photo_path)
 
-            dest_folder_path = photos_dir + delimiter + str(photo_date)
+            # uncomment one of the following lines to send the photos to either a subfolder of the original dump folder, or to a generic dest (ideally it would be subfoldered by /year/month)
+            dest_folder_path = photo_dump_folder + delimiter + str(photo_date)
+            # dest_folder_path = photos_dir + delimiter + str(photo_date)
             
             folder_exists = isdir(dest_folder_path)
             if not folder_exists:
