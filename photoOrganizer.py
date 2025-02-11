@@ -1,14 +1,15 @@
 
 
-from os import mkdir, scandir, rename, path
+from os import mkdir, scandir, rename as move_file, path
 from os.path import isdir
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from pillow_heif import open_heif
 from datetime import datetime
+import utils
 
 photos_dir = "D:\\Photos"
 delimiter = "\\"
-specific_folder_name = "RenFaire"
+specific_folder_name = "TEST_DELETE_AFTER"
 photo_dump_folder = photos_dir + delimiter + specific_folder_name
 
 """turns .*yyyy:mm:dd.* into yyyy-mm-dd"""
@@ -47,6 +48,9 @@ def getModifiedDate(path_to_photo):
 
 if __name__ == "__main__":
 
+    log_file_name = utils.gen_log_file_name()
+    log_file = open("logs/" + log_file_name, "w")
+
     if not isdir(photo_dump_folder):
         print("\nbad directory; " + photo_dump_folder + " does not exist\n")
         exit()
@@ -62,8 +66,11 @@ if __name__ == "__main__":
 
             try:
                 photo_date = getExifDate(src_photo_path)
-            except KeyError: # PNGs, screenshots don't have exif data
+            except KeyError: # PNGs & screenshots don't have exif data
                 photo_date = getModifiedDate(src_photo_path)
+            except UnidentifiedImageError: #could be a video or something else
+                photo_date = getModifiedDate(src_photo_path)
+
 
             # uncomment one of the following lines to send the photos to either a subfolder of the original dump folder, or to a generic dest (ideally it would be subfoldered by /year/month)
             dest_folder_path = photo_dump_folder + delimiter + str(photo_date)
@@ -74,8 +81,14 @@ if __name__ == "__main__":
                 mkdir(dest_folder_path)
 
             dest_photo_path = dest_folder_path + delimiter + file_name
+
+            log_file.write(file_name + ": " + src_photo_path + " -> " + dest_photo_path)
+
+            # TODO identify duplicates, do not attempt move if a duplicate is found
             
             try:
-                rename(src_photo_path, dest_photo_path)
+                move_file(src_photo_path, dest_photo_path)
             except FileExistsError:
                 print(dest_folder_path)
+
+    log_file.close()
